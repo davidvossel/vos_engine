@@ -1,0 +1,98 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BLUE_DOT	vos_main.cpp	/^int BLUE_DOT;$/;"	v
+CC	Makefile	/^CC=g++$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-c -Wall -g$/;"	m
+Dot	vos_main.cpp	/^Dot::Dot(vos_collision_engine *_c_engine)$/;"	f	class:Dot
+Dot	vos_main.cpp	/^class Dot$/;"	c	file:
+EXECUTABLE	Makefile	/^EXECUTABLE=test$/;"	m
+HIT_BOXES	vos_collision_engine.h	9;"	d
+LDFLAGS	Makefile	/^LDFLAGS=-lSDL -lSDL_image -lSDL_gfx$/;"	m
+NUM_DOTS	vos_main.cpp	115;"	d	file:
+OBJECTS	Makefile	/^OBJECTS=$(SOURCES:.cpp=.o)$/;"	m
+RED_DOT	vos_main.cpp	/^int RED_DOT;$/;"	v
+SOURCES	Makefile	/^SOURCES=vos_main.cpp vos_screen.cpp vos_image.cpp vos_graphic_engine.cpp vos_collision_engine.cpp$/;"	m
+VOS_COLLISION	vos_collision_engine.h	2;"	d
+VOS_GRAPHICS	vos_graphic_engine.h	2;"	d
+VOS_IMAGE	vos_image.h	2;"	d
+VOS_SCREEN	vos_screen.h	2;"	d
+add_image	vos_graphic_engine.cpp	/^int vos_graphic_engine::add_image(const char *file_name, int id)$/;"	f	class:vos_graphic_engine
+bits	vos_screen.h	/^		int bits;$/;"	m	class:vos_screen
+boxes	vos_collision_engine.h	/^		map <unsigned int, struct vos_collision_engine_rect *> boxes[HIT_BOXES];$/;"	m	class:vos_collision_engine
+c_engine	vos_main.cpp	/^	vos_collision_engine *c_engine;$/;"	m	class:Dot	file:
+cat	vos_collision_engine.h	/^	int cat;$/;"	m	struct:vos_collision_engine_rect
+cb	vos_collision_engine.h	/^	vos_collision_engine_cb cb;$/;"	m	struct:vos_collision_engine_rect
+collision_cb	vos_main.cpp	/^int collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)$/;"	f
+colorkey	vos_image.h	/^		int colorkey;$/;"	m	class:vos_image
+detect_collision	vos_collision_engine.cpp	/^int vos_collision_engine::detect_collision(struct vos_collision_engine_rect *rect_a, struct vos_collision_engine_rect *rect_b)$/;"	f	class:vos_collision_engine
+draw	vos_image.cpp	/^int vos_image::draw(int x, int y, vos_screen *dst, int width_scale_ratio, int height_scale_ratio)$/;"	f	class:vos_image
+draw_image	vos_graphic_engine.cpp	/^int vos_graphic_engine::draw_image(int id, int x, int y)$/;"	f	class:vos_graphic_engine
+file	vos_image.h	/^		char file[512];$/;"	m	class:vos_image
+flip	vos_graphic_engine.cpp	/^int vos_graphic_engine::flip()$/;"	f	class:vos_graphic_engine
+flip	vos_screen.cpp	/^int vos_screen::flip()$/;"	f	class:vos_screen
+gen_id	vos_collision_engine.h	/^		unsigned int gen_id;$/;"	m	class:vos_collision_engine
+get_image	vos_image.cpp	/^SDL_Surface *vos_image::get_image()$/;"	f	class:vos_image
+get_name	vos_image.cpp	/^const char *vos_image::get_name()$/;"	f	class:vos_image
+get_sdl_screen	vos_screen.cpp	/^SDL_Surface *vos_screen::get_sdl_screen()$/;"	f	class:vos_screen
+h	vos_collision_engine.h	/^	int h;$/;"	m	struct:vos_collision_engine_rect
+handle_event	vos_graphic_engine.cpp	/^void vos_graphic_engine::handle_event(SDL_Event *event)$/;"	f	class:vos_graphic_engine
+handle_event	vos_screen.cpp	/^void vos_screen::handle_event(SDL_Event *event)$/;"	f	class:vos_screen
+handle_quit_events	vos_main.cpp	/^int handle_quit_events(SDL_Event *event)$/;"	f
+height	vos_screen.h	/^		int height;$/;"	m	class:vos_screen
+height_scale_ratio	vos_screen.cpp	/^float vos_screen::height_scale_ratio()$/;"	f	class:vos_screen
+hit_timeout	vos_main.cpp	/^	int hit_timeout;$/;"	m	class:Dot	file:
+hitid	vos_main.cpp	/^	unsigned int hitid;$/;"	m	class:Dot	file:
+id	vos_collision_engine.h	/^	unsigned int id;$/;"	m	struct:vos_collision_engine_rect
+id_gen	vos_graphic_engine.h	/^		int id_gen;$/;"	m	class:vos_graphic_engine
+image	vos_image.h	/^		SDL_Surface *image;$/;"	m	class:vos_image
+images	vos_graphic_engine.h	/^		map <int, vos_image *> images;$/;"	m	class:vos_graphic_engine
+in_maps	vos_collision_engine.h	/^	int in_maps[HIT_BOXES];$/;"	m	struct:vos_collision_engine_rect
+ishit	vos_main.cpp	/^	int ishit;$/;"	m	class:Dot	file:
+main	vos_main.cpp	/^int main(int argc, char* args[])$/;"	f
+rects	vos_collision_engine.h	/^		map <unsigned int, struct vos_collision_engine_rect *> rects;$/;"	m	class:vos_collision_engine
+register_rect	vos_collision_engine.cpp	/^unsigned int vos_collision_engine::register_rect(vos_collision_engine_cb cb,$/;"	f	class:vos_collision_engine
+render	vos_main.cpp	/^void Dot::render(vos_graphic_engine *g_engine, int time_lapse)$/;"	f	class:Dot
+run_collisions	vos_collision_engine.cpp	/^void vos_collision_engine::run_collisions()$/;"	f	class:vos_collision_engine
+scaled_image	vos_image.h	/^		SDL_Surface *scaled_image;$/;"	m	class:vos_image
+screen	vos_graphic_engine.h	/^		vos_screen *screen;$/;"	m	class:vos_graphic_engine
+screen	vos_screen.h	/^		SDL_Surface *screen;$/;"	m	class:vos_screen
+sections	vos_collision_engine.h	/^		struct vos_collision_engine_rect sections[HIT_BOXES];$/;"	m	class:vos_collision_engine	typeref:struct:vos_collision_engine::vos_collision_engine_rect
+unregister_rect	vos_collision_engine.cpp	/^int vos_collision_engine::unregister_rect(unsigned int id)$/;"	f	class:vos_collision_engine
+update_caption	vos_graphic_engine.cpp	/^int vos_graphic_engine::update_caption(const char *text)$/;"	f	class:vos_graphic_engine
+update_caption	vos_screen.cpp	/^int vos_screen::update_caption(const char *text)$/;"	f	class:vos_screen
+update_rect_coordinates	vos_collision_engine.cpp	/^int vos_collision_engine::update_rect_coordinates(unsigned int id, int x, int y)$/;"	f	class:vos_collision_engine
+update_rect_map	vos_collision_engine.cpp	/^int vos_collision_engine::update_rect_map(struct vos_collision_engine_rect *rect)$/;"	f	class:vos_collision_engine
+update_rect_size	vos_collision_engine.cpp	/^int vos_collision_engine::update_rect_size(unsigned int id, int w, int h)$/;"	f	class:vos_collision_engine
+userdata	vos_collision_engine.h	/^	void *userdata;$/;"	m	struct:vos_collision_engine_rect
+vos_collision_engine	vos_collision_engine.cpp	/^vos_collision_engine::vos_collision_engine(int _x, int _y)$/;"	f	class:vos_collision_engine
+vos_collision_engine	vos_collision_engine.h	/^class vos_collision_engine {$/;"	c
+vos_collision_engine_cb	vos_collision_engine.h	/^typedef int (*vos_collision_engine_cb)(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);$/;"	t
+vos_collision_engine_rect	vos_collision_engine.h	/^struct vos_collision_engine_rect {$/;"	s
+vos_graphic_engine	vos_graphic_engine.cpp	/^vos_graphic_engine::vos_graphic_engine(const char *caption, int w, int h, int b)$/;"	f	class:vos_graphic_engine
+vos_graphic_engine	vos_graphic_engine.h	/^class vos_graphic_engine {$/;"	c
+vos_image	vos_image.cpp	/^vos_image::vos_image(const char *file_name) {$/;"	f	class:vos_image
+vos_image	vos_image.h	/^class vos_image {$/;"	c
+vos_screen	vos_screen.cpp	/^vos_screen::vos_screen(const char *caption, int w, int h, int b)$/;"	f	class:vos_screen
+vos_screen	vos_screen.h	/^class vos_screen {$/;"	c
+w	vos_collision_engine.h	/^	int w;$/;"	m	struct:vos_collision_engine_rect
+width	vos_screen.h	/^		int width;$/;"	m	class:vos_screen
+width_scale_ratio	vos_screen.cpp	/^float vos_screen::width_scale_ratio()$/;"	f	class:vos_screen
+windowed	vos_screen.h	/^		int windowed;$/;"	m	class:vos_screen
+x	vos_collision_engine.h	/^		int x;$/;"	m	class:vos_collision_engine
+x	vos_collision_engine.h	/^	int x;$/;"	m	struct:vos_collision_engine_rect
+x	vos_main.cpp	/^    float x, y;$/;"	m	class:Dot	file:
+x_dir	vos_main.cpp	/^	int x_dir;$/;"	m	class:Dot	file:
+x_pix_sec	vos_main.cpp	/^	int x_pix_sec;$/;"	m	class:Dot	file:
+y	vos_collision_engine.h	/^		int y;$/;"	m	class:vos_collision_engine
+y	vos_collision_engine.h	/^	int y;$/;"	m	struct:vos_collision_engine_rect
+y	vos_main.cpp	/^    float x, y;$/;"	m	class:Dot	file:
+y_dir	vos_main.cpp	/^	int y_dir;$/;"	m	class:Dot	file:
+y_pix_sec	vos_main.cpp	/^	int y_pix_sec;$/;"	m	class:Dot	file:
+~vos_collision_engine	vos_collision_engine.cpp	/^vos_collision_engine::~vos_collision_engine()$/;"	f	class:vos_collision_engine
+~vos_graphic_engine	vos_graphic_engine.cpp	/^vos_graphic_engine::~vos_graphic_engine()$/;"	f	class:vos_graphic_engine
+~vos_image	vos_image.cpp	/^vos_image::~vos_image() {$/;"	f	class:vos_image
+~vos_screen	vos_screen.cpp	/^vos_screen::~vos_screen()$/;"	f	class:vos_screen
