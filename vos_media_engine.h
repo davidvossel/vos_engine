@@ -38,7 +38,10 @@ class vos_media_engine {
 		~vos_media_engine();
 		int update_caption(const char *text);
 		int flip();
-		void handle_event(SDL_Event *event);
+
+		int make_full_screen();
+		int make_windowed();
+		int resize_screen(int x, int y);
 
 		int add_font(const char *font_name,
 			int size,

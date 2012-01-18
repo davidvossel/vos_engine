@@ -13,7 +13,9 @@ class vos_screen {
 		vos_screen(const char *caption = NULL, int w = 640, int h = 480, int b = 24);
 		~vos_screen();
 		int flip();
-		void handle_event(SDL_Event *event);
+		int make_full_screen();
+		int make_windowed();
+		int resize_screen(int x, int y);
 		SDL_Surface *get_sdl_screen();
 		float width_scale_ratio();
 		float height_scale_ratio();

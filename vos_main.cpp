@@ -171,8 +171,12 @@ int main(int argc, char* args[])
 	while (!quit) {
 		while (SDL_PollEvent(&event)) {
 			quit = handle_quit_events(&event);
-			m_engine->handle_event(&event);
+		    if (event.type == SDL_VIDEORESIZE) {
+				m_engine->resize_screen(event.resize.w, event.resize.h);
+		    }
+
 		}
+
 		now = SDL_GetTicks();
 		diff = now-last;
 		frame_counter += diff;

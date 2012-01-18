@@ -21,9 +21,19 @@ vos_media_engine::~vos_media_engine()
 	SDL_Quit();
 }
 
-void vos_media_engine::handle_event(SDL_Event *event)
+int vos_media_engine::make_full_screen()
 {
-	screen->handle_event(event);
+	return screen->make_full_screen();
+}
+
+int vos_media_engine::make_windowed()
+{
+	return screen->make_windowed();
+}
+
+int vos_media_engine::resize_screen(int x, int y)
+{
+	return screen->resize_screen(x, y);
 }
 
 int vos_media_engine::flip()

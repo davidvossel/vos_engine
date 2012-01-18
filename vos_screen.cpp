@@ -43,32 +43,38 @@ SDL_Surface *vos_screen::get_sdl_screen()
 	return screen;
 }
 
-void vos_screen::handle_event(SDL_Event *event)
+int vos_screen::make_full_screen()
 {
-    if (event->type == SDL_VIDEORESIZE) {
-        screen = SDL_SetVideoMode(
-			event->resize.w,
-			event->resize.h,
+	if (windowed) {
+		windowed = 0;
+		screen = SDL_SetVideoMode(width,
+			height,
+			bits,
+			SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+	}
+	return 0;
+}
+
+int vos_screen::make_windowed()
+{
+	if (!windowed) {
+		windowed = 1;
+		screen = SDL_SetVideoMode(width,
+			height,
 			bits,
 			SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF);
-    }
-
-    if ((event->type == SDL_KEYDOWN) && (event->key.keysym.sym == SDLK_RETURN)) {
-		if (!windowed) {
-			windowed = 1;
-			screen = SDL_SetVideoMode(width,
-				height,
-				bits,
-				SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF);
-		} else {
-			windowed = 0;
-			screen = SDL_SetVideoMode(width,
-				height,
-				bits,
-				SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
-		}
-
 	}
+	return 0;
+}
+
+int vos_screen::resize_screen(int x, int y)
+{
+	screen = SDL_SetVideoMode(
+		x,
+		y,
+		bits,
+		SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF);
+	return 0;
 }
 
 float vos_screen::width_scale_ratio()
