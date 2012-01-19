@@ -23,7 +23,6 @@ class vos_media_engine {
 		vos_screen *screen;
 		int id_gen;
 
-
 		int music_helper(int id,
 			int play,
 			int stop,

@@ -4,6 +4,8 @@
 #include "SDL/SDL_image.h"
 #include "vos_screen.h"
 
+using namespace std;
+
 class vos_image {
 	private:
 		SDL_Surface *image;
