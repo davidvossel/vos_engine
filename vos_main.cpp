@@ -3,11 +3,19 @@
 #include "vos_media_engine.h"
 #include "vos_collision_engine.h"
 #include "vos_map.h"
+#include "vos_map_common.h"
 #include "vos_image.h"
 #include <cstdlib>
 #include <iostream>
 
 using namespace std;
+
+#define X_MAP 2000
+#define Y_MAP 2000
+
+#define X_RES 720
+#define Y_RES 480
+
 
 int RED_DOT;
 int BLUE_DOT;
@@ -23,40 +31,8 @@ int BEAT_MUSIC;
 int _camera_x = 0;
 int _camera_y = 0;
 
-#define X_MAP 100000
-#define Y_MAP 100000
-
-#define X_RES 640
-#define Y_RES 480
-
 int collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
 
-class Block: public vos_map_object {
-    private:
-    public:
-		Block(int x, int y, vos_media_engine *m_engine, vos_collision_engine *c_engine) :
-			vos_map_object(x, y, m_engine, c_engine)
-	{
-	}
-
-    int update();
-    int render(int camera_x, int camera_y, int ticks);
-};
-
-int Block::update()
-{
-	return 0;
-}
-int Block::render(int camera_x, int camera_y, int ticks)
-{
-	int camx = map2cam_x(x, camera_x);
-	int camy = map2cam_y(y, camera_y);
-	m_engine->draw_image(GREEN_BLOCK, camx, camy);
-
-	return 0;
-}
-
-//The dot
 class Dot: public vos_map_object {
     private:
 	unsigned int hitid;
@@ -230,7 +206,7 @@ int main(int argc, char* args[])
 		map->add_object(dot);
 	}
 	for (i = 0; i < X_MAP; i+=40) {
-		map->add_object(new Block(i,0,m_engine, &c_engine));
+		map->add_object(new vos_map_block(GREEN_BLOCK, i, 0, m_engine, &c_engine));
 	}
 
 	now = SDL_GetTicks();

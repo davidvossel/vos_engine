@@ -11,11 +11,6 @@ vos_map_object::vos_map_object(int _x, int _y, vos_media_engine *_m_engine, vos_
 	id = 0;
 }
 
-vos_map_object::~vos_map_object()
-{
-
-}
-
 int vos_map_object::get_x()
 {
 	return x;

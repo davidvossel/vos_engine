@@ -26,7 +26,7 @@ class vos_map_object {
 			int y,
 			vos_media_engine *m_engine,
 			vos_collision_engine *c_engine);
-		~vos_map_object();
+		virtual ~vos_map_object() {};
 
 		/* get x_coordinate */
 		int get_x();
