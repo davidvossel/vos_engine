@@ -133,20 +133,11 @@ int vos_map::remove_object_from_chunk(vos_map_object *obj)
 	return 0;
 }
 
-int vos_map::remove_object(int id)
+int vos_map::remove_and_delete_object(vos_map_object *obj)
 {
-	vos_map_object *obj = NULL;
-	map_ii = obj_map.find(id);
-
-	if (map_ii == obj_map.end()) {
-		return -1;
-	}
-
-	obj = (*map_ii).second;
 	remove_object_from_chunk(obj);
-
+	obj_map.erase(obj->get_id());
 	delete obj;
-
 	return 0;
 }
 
@@ -178,13 +169,15 @@ int vos_map::render_chunk(int x_index, int y_index)
 	for (map_ii = tmp->begin(); map_ii!=tmp->end(); ++map_ii) {
 		obj = (*map_ii).second;
 
-		obj->update();
-		obj->render(camera_x, camera_y, ticks);
-
 		if (obj->delete_me()) {
-			tmp->erase(obj->get_id());
-			remove_object(obj->get_id());
-		} else if ((x_index != x_to_x_chunk_index(obj->get_x())) || (y_index != y_to_y_chunk_index(obj->get_y()))) {
+			delete_list.push_back(obj);
+			continue;
+		}
+
+		obj->update(ticks);
+		obj->render(ticks);
+
+		if ((x_index != x_to_x_chunk_index(obj->get_x())) || (y_index != y_to_y_chunk_index(obj->get_y()))) {
 			tmp->erase(obj->get_id());
 			update_location_list.push_back(obj);
 		}
@@ -204,6 +197,7 @@ int vos_map::render()
 	 */
 
 	update_location_list.clear();
+	delete_list.clear();
 
 	render_chunk(x_index, y_index);
 	render_chunk(x_index+1, y_index);
@@ -215,6 +209,14 @@ int vos_map::render()
 		++list_ii) {
 		put_object_in_chunk(*list_ii);
 	}
+
+	for (list_ii = delete_list.begin();
+		list_ii != delete_list.end();
+		++list_ii) {
+		remove_and_delete_object(*list_ii);
+	}
+
+
 
 	return 0;
 }

@@ -18,8 +18,8 @@ class vos_map_block: public vos_map_object {
 			image_id = _image_id;
 		}
 
-    int update() { return 0; };
-    int render(int camera_x, int camera_y, int ticks);
+    int update(int ticks) { return 0; };
+    int render(int ticks);
 };
 
 #endif

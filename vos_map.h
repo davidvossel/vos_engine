@@ -13,7 +13,6 @@ using namespace std;
 #define MAX_Y_CHUNKS 1000
 
 struct vos_map_object_data;
-
 class vos_map;
 
 class vos_map_object {
@@ -49,9 +48,9 @@ class vos_map_object {
 		}
 
 		/* update means update your AI logic or whatever */
-		virtual int update() = 0;
+		virtual int update(int ticks) = 0;
 		/* Render means that you're actually getting drawn on the screen */
-		virtual int render(int camera_x, int camera_y, int ticks) = 0;
+		virtual int render(int ticks) = 0;
 		/* when this returns true, the object gets removed from chunk */
 		int delete_me();
 
@@ -78,6 +77,7 @@ class vos_map {
 		map <unsigned int, vos_map_object *>::iterator map_ii;
 
 		list <vos_map_object *> update_location_list;
+		list <vos_map_object *> delete_list;
 		list <vos_map_object *>::iterator list_ii;
 
 		int render_chunk(int x_index, int y_index);
@@ -87,14 +87,16 @@ class vos_map {
 		int x_to_x_chunk_index(int x);
 		int y_to_y_chunk_index(int y);
 
+		int remove_and_delete_object(vos_map_object *obj);
 	public:
 		vos_map(int w, int h, int camera_w, int camera_h);
 		~vos_map();
 
 		int center_camera_on(int x, int y);
 		int update_camera(int x, int y);
+		int get_camera_x() { return camera_x; }
+		int get_camera_y() { return camera_y; }
 		int add_object(vos_map_object *obj);
-		int remove_object(int id);
 		int render();
 };
 

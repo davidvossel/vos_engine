@@ -29,13 +29,110 @@ int LOW_SOUND;
 
 int BEAT_MUSIC;
 
+int COLLISION_CAT_PLAYER1 = 10;
+int COLLISION_CAT_THING = 11;
+
 unsigned int PLAYER1_CONTROLLER;
 
 int _camera_x = 0;
 int _camera_y = 0;
 
-int collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
+int player_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
+class player: public vos_map_object {
+	private:
+		int hitid;
+		int last_tick;
+	public:
+		int hit;
+		player(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
+			hit = 0;
+			hitid = c_engine->register_rect(player_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
+		}
+		~player() {
+			c_engine->unregister_rect(hitid);
+		}
 
+		int update(int ticks) {
+			int time_lapse = ticks - last_tick;
+			int dist = calc_dist(time_lapse, 200);
+			last_tick = ticks;
+
+			if (hit) {
+				hit = 0;
+			}
+
+			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
+				y += dist;
+			}
+			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_UP)) {
+				y -= dist;
+			}
+			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_LEFT)) {
+				x -= dist;
+			}
+			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_RIGHT)) {
+				x += dist;
+			}
+
+			map->center_camera_on(x, y);
+			return 0;
+		}
+		int render(int ticks) {
+			int camx = map2cam_x(x, map->get_camera_x());
+			int camy = map2cam_y(y, map->get_camera_y());
+			m_engine->draw_image(BLUE_DOT, camx, camy);
+			c_engine->update_rect_coordinates(hitid, camx, camy);
+
+			return 0;
+		}
+};
+int player_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
+{
+	player *p = (player *) userdata;
+	p->hit = 1;
+
+	return 0;
+}
+
+int thing_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
+class thing: public vos_map_object {
+	private:
+		int hitid;
+	public:
+		int hit;
+		thing(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
+			hit = 0;
+			hitid = c_engine->register_rect(thing_cb, 1, this, x, y, 3, 3);
+		}
+		~thing() {
+			c_engine->unregister_rect(hitid);
+		}
+
+		int update(int ticks) {
+			if (hit) {
+				ready_for_deletion = 1;
+			}
+			return 0;
+		}
+		int render(int ticks) {
+			int camx = map2cam_x(x, map->get_camera_x());
+			int camy = map2cam_y(y, map->get_camera_y());
+			m_engine->draw_image(RED_DOT, camx, camy);
+			c_engine->update_rect_coordinates(hitid, camx, camy);
+
+			return 0;
+		}
+};
+int thing_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
+{
+	thing *t = (thing *) userdata;
+	t->hit = 1;
+
+	return 0;
+}
+
+
+#if 0
 class Dot: public vos_map_object {
     private:
 	unsigned int hitid;
@@ -59,25 +156,14 @@ class Dot: public vos_map_object {
 		y_dir = 1;
 		hit_timeout = 0;
 		last_ticks = 0;
-		hitid = c_engine->register_rect(collision_cb, 1, this, -1, -1, 3, 3);
+		hitid = c_engine->register_rect(player_cb, 1, this, -1, -1, 3, 3);
 	}
 
-    int update();
+    int update(int ticks) { return 0; }
     int render(int camera_x, int camera_y, int ticks);
 };
 
-int collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
-{
-	Dot *dot = (Dot *) userdata;
-	dot->ishit = 1;
 
-	return 0;
-}
-
-int Dot::update()
-{
-	return 0;
-}
 
 int Dot::render(int camera_x, int camera_y, int ticks)
 {
@@ -91,7 +177,6 @@ int Dot::render(int camera_x, int camera_y, int ticks)
 		return 0;
 	}
 	last_ticks = ticks;
-
 
 	x_dist = calc_dist(time_lapse, x_pix_sec*x_dir);
 	y_dist = calc_dist(time_lapse, y_pix_sec*y_dir);
@@ -137,9 +222,9 @@ int Dot::render(int camera_x, int camera_y, int ticks)
 	}
 	c_engine->update_rect_coordinates(hitid, camx, camy);
 
-
 	return 0;
 }
+#endif
 
 int handle_events(SDL_Event *event)
 {
@@ -148,24 +233,6 @@ int handle_events(SDL_Event *event)
 	}
 	if (event->type == SDL_QUIT ) {
 		return 1;
-	}
-
-	if ( event->type == SDL_KEYDOWN ) {
-		switch( (int) event->key.keysym.sym ) {
-		case SDLK_UP:
-			_camera_y -= 50;
-			break;
-		case SDLK_DOWN:
-			_camera_y += 50;
-			break;
-		case SDLK_LEFT:
-			_camera_x -= 50;
-			break;
-		case SDLK_RIGHT:
-			_camera_x += 50;
-			break;
-		}
-		cout << "cam x: " << _camera_x << " cam y " << _camera_y << "\n";
 	}
 
 	return 0;
@@ -177,11 +244,11 @@ int main(int argc, char* args[])
 {
 	SDL_Event event;
 	vos_media_engine *m_engine = new vos_media_engine(NULL, X_RES, Y_RES);
-	vos_collision_engine c_engine(X_RES, Y_RES);
+	vos_collision_engine *c_engine = new vos_collision_engine(X_RES, Y_RES);
 	vos_controller_engine *controllers = new vos_controller_engine();
 	vos_map *map = new vos_map(X_MAP, Y_MAP, X_RES, Y_RES);
 	struct vos_map_object_data data;
-	Dot *dot;
+//	Dot *dot;
 	int res = 1;
 	int quit = 0;
 	int last;
@@ -192,7 +259,7 @@ int main(int argc, char* args[])
 	int frame_counter;
 	int text_id = 0;
 
-	data.c_engine = &c_engine;
+	data.c_engine = c_engine;
 	data.m_engine = m_engine;
 	data.controllers = controllers;
 	data.map = map;
@@ -208,26 +275,28 @@ int main(int argc, char* args[])
 	LOW_SOUND = m_engine->add_sound("low.wav");
 	BEAT_MUSIC = m_engine->add_music("beat.wav");
 
-
 	PLAYER1_CONTROLLER = controllers->new_controller();
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_UP, SDLK_UP);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_DOWN, SDLK_DOWN);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_LEFT, SDLK_LEFT);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_RIGHT, SDLK_RIGHT);
 
+//	for (i = 0; i < NUM_DOTS; i++) {
+//		dot = new Dot(1, 1, &data);
+//		map->add_object(dot);
+//	}
 
-	for (i = 0; i < NUM_DOTS; i++) {
-		dot = new Dot(1, 1, &data);
-		map->add_object(dot);
-	}
-	for (i = 0; i < X_MAP; i+=40) {
-		map->add_object(new vos_map_block(GREEN_BLOCK, i, 0, &data));
+	map->add_object(new player(50, 50, &data));
+
+	for (i = 0; i < 100; i++) {
+		map->add_object(new thing(i*40, 0, &data));
 	}
 
 	now = SDL_GetTicks();
 	last = now;
 	diff = 0;
 	frame_counter = diff;
+
 	// game loop
 	while (!quit) {
 		while (SDL_PollEvent(&event)) {
@@ -247,23 +316,8 @@ int main(int argc, char* args[])
 		diff = now-last;
 		frame_counter += diff;
 		last = now;
-		c_engine.run_collisions();
+		c_engine->run_collisions();
 
-		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
-			_camera_y += 10;
-		}
-
-		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_UP)) {
-			_camera_y -= 10;
-		}
-		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_LEFT)) {
-			_camera_x -= 10;
-		}
-		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_RIGHT)) {
-			_camera_x += 10;
-		}
-
-		map->update_camera(_camera_x, _camera_y);
 		map->render();
 		m_engine->flip();
 		frames++;
@@ -278,6 +332,7 @@ int main(int argc, char* args[])
 		m_engine->draw_text(text_id, 100, 100);
 	}
 
+	delete c_engine;
 	delete m_engine;
 	delete controllers;
 	delete map;

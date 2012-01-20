@@ -8,6 +8,16 @@ using namespace std;
 // MUST BE mutliple of 4
 #define HIT_BOXES 16
 
+
+/*!
+ * \brief Some collisions catagories are predefined just
+ *        so some generic objects can be created.  Any of these
+ *        collision catagories can be overridden no problem
+ */
+enum vos_collision_cat {
+	VOS_COLLIDE_BOUNDARY = 1,
+};
+
 typedef int (*vos_collision_engine_cb)(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
 
 struct vos_collision_engine_rect {

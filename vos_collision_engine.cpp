@@ -1,5 +1,4 @@
 #include "vos_collision_engine.h"
-#include "stdlib.h"
 #include <iostream>
 
 vos_collision_engine::vos_collision_engine(int _x, int _y)
@@ -40,7 +39,7 @@ vos_collision_engine::vos_collision_engine(int _x, int _y)
 vos_collision_engine::~vos_collision_engine()
 {
 	for (map <unsigned int, struct vos_collision_engine_rect *>::iterator ii=rects.begin(); ii!=rects.end(); ++ii) {
-		free((*ii).second);
+		delete (*ii).second;
 	}
 }
 
@@ -53,7 +52,7 @@ unsigned int vos_collision_engine::register_rect(vos_collision_engine_cb cb,
 	map <unsigned int, vos_collision_engine_rect *>::iterator ii;
 
 
-	if (!(rect = (struct vos_collision_engine_rect *) calloc(1, sizeof(*rect)))) {
+	if (!(rect = new vos_collision_engine_rect())) {
 		return -1;
 	}
 
@@ -126,11 +125,16 @@ int vos_collision_engine::unregister_rect(unsigned int id)
 
 	rect = (*ii).second;
 	rects.erase(ii);
-	free(rect);
+
+	for (int i = 0; i < HIT_BOXES; i++) {
+		if (rect->in_maps[i]) {
+			boxes[i].erase(rect->id);
+		}
+	}
+	delete rect;
 
 	return 0;
 }
-
 
 int vos_collision_engine::update_rect_map(struct vos_collision_engine_rect *rect)
 {
