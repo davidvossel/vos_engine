@@ -17,6 +17,8 @@ class vos_image {
 		~vos_image();
 		SDL_Surface *get_image();
 		const char *get_name();
+		int get_height();
+		int get_width();
 		int draw(int x, int y, vos_screen *dst, int width_scale_ratio = 1, int height_scale_ratio = 1);
 };
 

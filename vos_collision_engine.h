@@ -15,7 +15,7 @@ using namespace std;
  *        collision catagories can be overridden no problem
  */
 enum vos_collision_cat {
-	VOS_COLLIDE_BOUNDARY = 1,
+	VOS_COLLIDE_BOUNDARY_CAT = 1,
 };
 
 typedef int (*vos_collision_engine_cb)(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);

@@ -225,6 +225,32 @@ int vos_media_engine::draw_text(int id, int x, int y)
 	return 0;
 }
 
+int vos_media_engine::image_width(int id)
+{
+	vos_image *image;
+	map <int, vos_image *>::iterator ii = images.find(id);
+
+	if (ii == images.end()) {
+		return 0;
+	}
+
+	image = (*ii).second;
+	return image->get_width();
+}
+
+int vos_media_engine::image_height(int id)
+{
+	vos_image *image;
+	map <int, vos_image *>::iterator ii = images.find(id);
+
+	if (ii == images.end()) {
+		return 0;
+	}
+
+	image = (*ii).second;
+	return image->get_height();
+}
+
 int vos_media_engine::draw_image(int id, int x, int y)
 {
 	vos_image *image;

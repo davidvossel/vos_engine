@@ -40,39 +40,76 @@ int _camera_y = 0;
 int player_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
 class player: public vos_map_object {
 	private:
-		int hitid;
+		int hitid_top;
+		int hitid_bottom;
+		int hitid_left;
+		int hitid_right;
+		int next_x;
+		int next_y;
 	public:
 		player(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
-			hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
+			hitid_top = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x-7, y-10, 3, 2);
+			hitid_bottom = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x-7, y+10, 3, 2);
+			hitid_left = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x-10, y-7, 2, 3);
+			hitid_right= c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x+13, y-7, 2, 3);
+			next_x = x;
+			next_y = y;
 		}
 		~player() {
-			c_engine->unregister_rect(hitid);
+			c_engine->unregister_rect(hitid_top);
+			c_engine->unregister_rect(hitid_bottom);
+			c_engine->unregister_rect(hitid_left);
+			c_engine->unregister_rect(hitid_right);
 		}
 
 		int update() {
 			int dist = calc_dist(ticks_diff, 200);
 
+			/* if we are about to hit a boundary, use last known safe coordinate,
+			 * we collision detect  one frame before rendering */
+			if (am_i_hit_by(hitid_bottom, VOS_COLLIDE_BOUNDARY_CAT) || am_i_hit_by(hitid_top, VOS_COLLIDE_BOUNDARY_CAT)) {
+				/* jump back on y */
+				next_y = y;
+			} else {
+				y = next_y;
+			}
+
+			if (am_i_hit_by(hitid_left, VOS_COLLIDE_BOUNDARY_CAT) || am_i_hit_by(hitid_right, VOS_COLLIDE_BOUNDARY_CAT)) {
+				/* jump back on y */
+				next_x = x;
+			} else {
+				x = next_x;
+			}
+
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
-				y += dist;
+				next_y += dist;
 			}
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_UP)) {
-				y -= dist;
+				next_y -= dist;
 			}
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_LEFT)) {
-				x -= dist;
+				next_x -= dist;
 			}
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_RIGHT)) {
-				x += dist;
+				next_x += dist;
 			}
 
 			map->center_camera_on(x, y);
+
 			return 0;
 		}
 		int render() {
 			int camx = map->map2cam_x(x);
 			int camy = map->map2cam_y(y);
+			int ncamx = map->map2cam_x(next_x);
+			int ncamy = map->map2cam_y(next_y);
+
 			m_engine->draw_image(BLUE_DOT, camx, camy);
-			c_engine->update_rect_coordinates(hitid, camx, camy);
+
+			c_engine->update_rect_coordinates(hitid_top, ncamx-7, ncamy-10);
+			c_engine->update_rect_coordinates(hitid_bottom, ncamx-7, ncamy+10);
+			c_engine->update_rect_coordinates(hitid_left, ncamx-10, ncamy-7);
+			c_engine->update_rect_coordinates(hitid_right, ncamx+13, ncamy-7);
 
 			return 0;
 		}
@@ -160,7 +197,14 @@ int main(int argc, char* args[])
 	map->add_object(new player(50, 50, &data));
 
 	for (i = 0; i < 100; i++) {
-		map->add_object(new thing(i*40, 0, &data));
+		map->add_object(new thing(i*40, 100, &data));
+	}
+
+	for (i = 0; i < 40; i++) {
+		map->add_object(new vos_map_boundary(GREEN_BLOCK, i*40, 0, &data));
+	}
+	for (i = 0; i < 40; i++) {
+		map->add_object(new vos_map_boundary(GREEN_BLOCK, 0, i*40, &data));
 	}
 
 	now = SDL_GetTicks();

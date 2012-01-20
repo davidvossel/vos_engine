@@ -40,6 +40,16 @@ const char *vos_image::get_name()
 	return file;
 }
 
+int vos_image::get_height()
+{
+	return image->h;
+}
+
+int vos_image::get_width()
+{
+	return image->w;
+}
+
 int vos_image::draw(int x, int y, vos_screen *dst, int width_scale_ratio, int height_scale_ratio)
 {
     SDL_Rect offset = { 0, };

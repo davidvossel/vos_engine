@@ -47,6 +47,8 @@ class vos_media_engine {
 
 		int add_image(const char *file_name, int id = 0);
 		int draw_image(int id, int x, int y);
+		int image_height(int id);
+		int image_width(int id);
 
 		int create_text(const char *text,
 			int font_id,
