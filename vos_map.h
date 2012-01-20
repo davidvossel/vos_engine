@@ -84,6 +84,7 @@ class vos_map {
 		vos_map(int w, int h, int camera_w, int camera_h);
 		~vos_map();
 
+		int center_camera_on(int x, int y);
 		int update_camera(int x, int y);
 		int add_object(vos_map_object *obj);
 		int remove_object(int id);

@@ -2,7 +2,6 @@
 #define VOS_GRAPHICS
 #include <map>
 #include <iostream>
-#include <string.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "vos_screen.h"

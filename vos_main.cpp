@@ -2,6 +2,7 @@
 #include <string>
 #include "vos_media_engine.h"
 #include "vos_collision_engine.h"
+#include "vos_controller_engine.h"
 #include "vos_map.h"
 #include "vos_map_common.h"
 #include "vos_image.h"
@@ -27,6 +28,8 @@ int MED_SOUND;
 int LOW_SOUND;
 
 int BEAT_MUSIC;
+
+unsigned int PLAYER1_CONTROLLER;
 
 int _camera_x = 0;
 int _camera_y = 0;
@@ -175,6 +178,7 @@ int main(int argc, char* args[])
 	SDL_Event event;
 	vos_media_engine *m_engine = new vos_media_engine(NULL, X_RES, Y_RES);
 	vos_collision_engine c_engine(X_RES, Y_RES);
+	vos_controller_engine *controllers = new vos_controller_engine();
 	vos_map *map;
 	Dot *dot;
 	int res = 1;
@@ -198,6 +202,13 @@ int main(int argc, char* args[])
 	LOW_SOUND = m_engine->add_sound("low.wav");
 	BEAT_MUSIC = m_engine->add_music("beat.wav");
 
+
+	PLAYER1_CONTROLLER = controllers->new_controller();
+	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_UP, SDLK_UP);
+	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_DOWN, SDLK_DOWN);
+	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_LEFT, SDLK_LEFT);
+	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_RIGHT, SDLK_RIGHT);
+
 	map = new vos_map(X_MAP, Y_MAP, X_RES, Y_RES);
 
 	for (i = 0; i < NUM_DOTS; i++) {
@@ -219,6 +230,12 @@ int main(int argc, char* args[])
 		    if (event.type == SDL_VIDEORESIZE) {
 				m_engine->resize_screen(event.resize.w, event.resize.h);
 		    }
+			if (event.type == SDL_KEYDOWN) {
+				controllers->process_event_key(event.key.keysym.sym, 1);
+			}
+			if (event.type == SDL_KEYUP) {
+				controllers->process_event_key(event.key.keysym.sym, 0);
+			}
 		}
 
 		now = SDL_GetTicks();
@@ -226,6 +243,20 @@ int main(int argc, char* args[])
 		frame_counter += diff;
 		last = now;
 		c_engine.run_collisions();
+
+		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
+			_camera_y += 10;
+		}
+
+		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_UP)) {
+			_camera_y -= 10;
+		}
+		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_LEFT)) {
+			_camera_x -= 10;
+		}
+		if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_RIGHT)) {
+			_camera_x += 10;
+		}
 
 		map->update_camera(_camera_x, _camera_y);
 		map->render();
@@ -242,6 +273,8 @@ int main(int argc, char* args[])
 		m_engine->draw_text(text_id, 100, 100);
 	}
 
+	delete m_engine;
+	delete controllers;
 	delete map;
 	res = 0;
 	return res;

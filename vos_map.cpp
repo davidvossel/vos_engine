@@ -63,6 +63,13 @@ vos_map::~vos_map()
 
 }
 
+int vos_map::center_camera_on(int x, int y)
+{
+	camera_x = x - (camera_w/2);
+	camera_y = y - (camera_h/2);
+	return 0;
+}
+
 int vos_map::update_camera(int x, int y)
 {
 	camera_x = x;
