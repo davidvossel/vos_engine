@@ -32,6 +32,15 @@ class vos_map_object {
 		int get_x();
 		/* get y_coordinate */
 		int get_y();
+
+		int calc_dist(int ticks, int pps) {
+			if (ticks) {
+				return (((float)ticks / 1000) * pps);
+			} else {
+				return 0;
+			}
+		}
+
 		/* update means update your AI logic or whatever */
 		virtual int update() = 0;
 		/* Render means that you're actually getting drawn on the screen */

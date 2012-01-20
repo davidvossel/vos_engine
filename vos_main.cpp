@@ -87,13 +87,12 @@ int Dot::render(int camera_x, int camera_y, int ticks)
 		last_ticks = ticks;
 		return 0;
 	}
-		last_ticks = ticks;
+	last_ticks = ticks;
 
 
-	if (time_lapse != 0) {
-		x_dist = ((float)time_lapse / 1000) * x_pix_sec * x_dir;
-		y_dist = ((float)time_lapse / 1000) * y_pix_sec * y_dir;
-	}
+	x_dist = calc_dist(time_lapse, x_pix_sec*x_dir);
+	y_dist = calc_dist(time_lapse, y_pix_sec*y_dir);
+
 	if (ishit) {
 		m_engine->play_sound(LOW_SOUND);
 		hit_timeout = 100;
