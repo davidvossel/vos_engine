@@ -11,6 +11,8 @@ vos_map_object::vos_map_object(int _x, int _y, struct vos_map_object_data *data)
 	y = _y;
 	ready_for_deletion = 0;
 	id = 0;
+	memset(&collisions_list, 0, sizeof(collisions_list));
+	num_collisions = 0;
 }
 
 int vos_map_object::get_x()
@@ -20,16 +22,6 @@ int vos_map_object::get_x()
 int vos_map_object::get_y()
 {
 	return y;
-}
-
-int vos_map_object::map2cam_x(int map_x, int camera_x)
-{
-	return map_x-camera_x;
-}
-
-int vos_map_object::map2cam_y(int map_y, int camera_y)
-{
-	return map_y-camera_y;
 }
 
 int vos_map_object::delete_me()
@@ -46,6 +38,51 @@ int vos_map_object::get_id()
 	return id;
 }
 
+int vos_map_object::am_i_hit_by(int myid, int hitcat) {
+	int i = 0;
+	if (!num_collisions) {
+		return 0;
+	}
+	for (i = 0; i < num_collisions; i++) {
+		if ((collisions_list[i].myid == myid) && (collisions_list[i].hitcat == hitcat)) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int vos_map_object::add_collision(int myid, int mycat, int hitid, int hitcat) {
+	if (num_collisions < COLLISION_LIST_SIZE) {
+		collisions_list[num_collisions].myid = myid;
+		collisions_list[num_collisions].mycat = mycat;
+		collisions_list[num_collisions].hitid = hitid;
+		collisions_list[num_collisions].hitcat = hitcat;
+		num_collisions++;
+	}
+	return 0;
+}
+void vos_map_object::remove_collisions() {
+	if (num_collisions) {
+		memset(&collisions_list, 0, sizeof(collisions_list));
+		num_collisions = 0;
+	}
+}
+
+int vos_map_object::calc_dist(int ticks, int pps) {
+	if (ticks) {
+		return (((float)ticks / 1000) * pps);
+	} else {
+		return 0;
+	}
+}
+
+int vos_map_object_collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
+{
+	vos_map_object *obj = (vos_map_object *) userdata;
+	obj->add_collision(myid, mycat, hitid, hitcat);
+	return 0;
+}
+
 vos_map::vos_map(int _w, int _h, int _camera_w, int _camera_h)
 {
 	w = _w;
@@ -54,8 +91,8 @@ vos_map::vos_map(int _w, int _h, int _camera_w, int _camera_h)
 	camera_w = _camera_w;
 	camera_h = _camera_h;
 
-	camera_x = 0;
-	camera_y = 0;
+	new_camera_x = camera_x = 0;
+	new_camera_y = camera_y = 0;
 
 	gen_id = 0;
 }
@@ -64,18 +101,27 @@ vos_map::~vos_map()
 {
 
 }
+int vos_map::map2cam_x(int map_x)
+{
+	return map_x-camera_x;
+}
+
+int vos_map::map2cam_y(int map_y)
+{
+	return map_y-camera_y;
+}
 
 int vos_map::center_camera_on(int x, int y)
 {
-	camera_x = x - (camera_w/2);
-	camera_y = y - (camera_h/2);
+	new_camera_x = x - (camera_w/2);
+	new_camera_y = y - (camera_h/2);
 	return 0;
 }
 
 int vos_map::update_camera(int x, int y)
 {
-	camera_x = x;
-	camera_y = y;
+	new_camera_x = x;
+	new_camera_y = y;
 	return 0;
 }
 
@@ -176,7 +222,7 @@ int vos_map::render_chunk(int x_index, int y_index)
 
 		obj->update(ticks);
 		obj->render(ticks);
-
+		obj->remove_collisions();
 		if ((x_index != x_to_x_chunk_index(obj->get_x())) || (y_index != y_to_y_chunk_index(obj->get_y()))) {
 			tmp->erase(obj->get_id());
 			update_location_list.push_back(obj);
@@ -195,6 +241,9 @@ int vos_map::render()
 	 * We are dealing with 4 chunks here
 	 * (x, y), (x+1, y), (x, y+1), (x+1, y+1)
 	 */
+
+	camera_x = new_camera_x;
+	camera_y = new_camera_y;
 
 	update_location_list.clear();
 	delete_list.clear();

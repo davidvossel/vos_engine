@@ -43,10 +43,8 @@ class player: public vos_map_object {
 		int hitid;
 		int last_tick;
 	public:
-		int hit;
 		player(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
-			hit = 0;
-			hitid = c_engine->register_rect(player_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
+			hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
 		}
 		~player() {
 			c_engine->unregister_rect(hitid);
@@ -56,10 +54,6 @@ class player: public vos_map_object {
 			int time_lapse = ticks - last_tick;
 			int dist = calc_dist(time_lapse, 200);
 			last_tick = ticks;
-
-			if (hit) {
-				hit = 0;
-			}
 
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
 				y += dist;
@@ -78,59 +72,41 @@ class player: public vos_map_object {
 			return 0;
 		}
 		int render(int ticks) {
-			int camx = map2cam_x(x, map->get_camera_x());
-			int camy = map2cam_y(y, map->get_camera_y());
+			int camx = map->map2cam_x(x);
+			int camy = map->map2cam_y(y);
 			m_engine->draw_image(BLUE_DOT, camx, camy);
 			c_engine->update_rect_coordinates(hitid, camx, camy);
 
 			return 0;
 		}
 };
-int player_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
-{
-	player *p = (player *) userdata;
-	p->hit = 1;
 
-	return 0;
-}
-
-int thing_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
 class thing: public vos_map_object {
 	private:
 		int hitid;
 	public:
-		int hit;
 		thing(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
-			hit = 0;
-			hitid = c_engine->register_rect(thing_cb, 1, this, x, y, 3, 3);
+		hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_THING, this, x, y, 3, 3);
 		}
 		~thing() {
 			c_engine->unregister_rect(hitid);
 		}
 
 		int update(int ticks) {
-			if (hit) {
+			if (am_i_hit_by(hitid, COLLISION_CAT_PLAYER1)) {
 				ready_for_deletion = 1;
 			}
 			return 0;
 		}
 		int render(int ticks) {
-			int camx = map2cam_x(x, map->get_camera_x());
-			int camy = map2cam_y(y, map->get_camera_y());
+			int camx = map->map2cam_x(x);
+			int camy = map->map2cam_y(y);
 			m_engine->draw_image(RED_DOT, camx, camy);
 			c_engine->update_rect_coordinates(hitid, camx, camy);
 
 			return 0;
 		}
 };
-int thing_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
-{
-	thing *t = (thing *) userdata;
-	t->hit = 1;
-
-	return 0;
-}
-
 
 #if 0
 class Dot: public vos_map_object {
