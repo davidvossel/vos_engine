@@ -49,8 +49,8 @@ class Dot: public vos_map_object {
     public:
 
 		int ishit;
-		Dot(int x, int y, vos_media_engine *m_engine, vos_collision_engine *c_engine) :
-			vos_map_object(x, y, m_engine, c_engine)
+		Dot(int x, int y, struct vos_map_object_data *data) :
+			vos_map_object(x, y, data)
 	{
 		ishit = 0;
 		x_pix_sec = ((unsigned int) rand() % 50) + 111;
@@ -179,7 +179,8 @@ int main(int argc, char* args[])
 	vos_media_engine *m_engine = new vos_media_engine(NULL, X_RES, Y_RES);
 	vos_collision_engine c_engine(X_RES, Y_RES);
 	vos_controller_engine *controllers = new vos_controller_engine();
-	vos_map *map;
+	vos_map *map = new vos_map(X_MAP, Y_MAP, X_RES, Y_RES);
+	struct vos_map_object_data data;
 	Dot *dot;
 	int res = 1;
 	int quit = 0;
@@ -190,6 +191,11 @@ int main(int argc, char* args[])
 	int frames = 0;
 	int frame_counter;
 	int text_id = 0;
+
+	data.c_engine = &c_engine;
+	data.m_engine = m_engine;
+	data.controllers = controllers;
+	data.map = map;
 
 	srand(1231);
 
@@ -209,14 +215,13 @@ int main(int argc, char* args[])
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_LEFT, SDLK_LEFT);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_RIGHT, SDLK_RIGHT);
 
-	map = new vos_map(X_MAP, Y_MAP, X_RES, Y_RES);
 
 	for (i = 0; i < NUM_DOTS; i++) {
-		dot = new Dot(1, 1, m_engine, &c_engine);
+		dot = new Dot(1, 1, &data);
 		map->add_object(dot);
 	}
 	for (i = 0; i < X_MAP; i+=40) {
-		map->add_object(new vos_map_block(GREEN_BLOCK, i, 0, m_engine, &c_engine));
+		map->add_object(new vos_map_block(GREEN_BLOCK, i, 0, &data));
 	}
 
 	now = SDL_GetTicks();

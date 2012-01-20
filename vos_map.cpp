@@ -1,10 +1,12 @@
 #include "vos_map.h"
 #include "SDL/SDL.h"
 
-vos_map_object::vos_map_object(int _x, int _y, vos_media_engine *_m_engine, vos_collision_engine *_c_engine)
+vos_map_object::vos_map_object(int _x, int _y, struct vos_map_object_data *data)
 {
-	m_engine = _m_engine;
-	c_engine = _c_engine;
+	m_engine = data->m_engine;
+	c_engine = data->c_engine;
+	map = data->map;
+	controllers = data->controllers;
 	x = _x;
 	y = _y;
 	ready_for_deletion = 0;

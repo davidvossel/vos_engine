@@ -12,11 +12,9 @@ class vos_map_block: public vos_map_object {
 		vos_map_block(int _image_id,
 			int x,
 			int y,
-			vos_media_engine *m_engine,
-			vos_collision_engine *c_engine) :
-			vos_map_object(x, y, m_engine, c_engine)
+			struct vos_map_object_data *data) :
+			vos_map_object(x, y, data)
 		{
-
 			image_id = _image_id;
 		}
 

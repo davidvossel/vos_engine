@@ -2,6 +2,7 @@
 #define VOS_MAP
 #include "vos_media_engine.h"
 #include "vos_collision_engine.h"
+#include "vos_controller_engine.h"
 #include <iostream>
 #include <map>
 #include <list>
@@ -11,10 +12,17 @@ using namespace std;
 #define MAX_X_CHUNKS 1000
 #define MAX_Y_CHUNKS 1000
 
+struct vos_map_object_data;
+
+class vos_map;
+
 class vos_map_object {
 	protected:
 		vos_media_engine *m_engine;
 		vos_collision_engine *c_engine;
+		vos_controller_engine *controllers;
+		vos_map *map;
+
 		int ready_for_deletion;
 		int x;
 		int y;
@@ -24,8 +32,7 @@ class vos_map_object {
 	public:
 		vos_map_object(int x,
 			int y,
-			vos_media_engine *m_engine,
-			vos_collision_engine *c_engine);
+			struct vos_map_object_data *data);
 		virtual ~vos_map_object() {};
 
 		/* get x_coordinate */
@@ -90,6 +97,15 @@ class vos_map {
 		int remove_object(int id);
 		int render();
 };
+
+struct vos_map_object_data {
+	vos_media_engine *m_engine;
+	vos_collision_engine *c_engine;
+	vos_controller_engine *controllers;
+	vos_map *map;
+};
+
+
 
 #endif
 
