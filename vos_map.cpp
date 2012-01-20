@@ -3,6 +3,7 @@
 
 vos_map_object::vos_map_object(int _x, int _y, struct vos_map_object_data *data)
 {
+	ticks_diff = ticks = 0;
 	m_engine = data->m_engine;
 	c_engine = data->c_engine;
 	map = data->map;
@@ -22,6 +23,23 @@ int vos_map_object::get_x()
 int vos_map_object::get_y()
 {
 	return y;
+}
+
+int vos_map_object::update_ticks(int _ticks)
+{
+	if (ticks == 0) {
+		ticks_diff = 0;
+		ticks = _ticks;
+	} else {
+		ticks_diff = _ticks - ticks;
+		ticks = _ticks;
+	}
+
+	/* if the time is lagged half a second, resync. */
+	if (ticks_diff > 500) {
+		ticks_diff = 0;
+	}
+	return 0;
 }
 
 int vos_map_object::delete_me()
@@ -220,8 +238,9 @@ int vos_map::render_chunk(int x_index, int y_index)
 			continue;
 		}
 
-		obj->update(ticks);
-		obj->render(ticks);
+		obj->update_ticks(ticks);
+		obj->update();
+		obj->render();
 		obj->remove_collisions();
 		if ((x_index != x_to_x_chunk_index(obj->get_x())) || (y_index != y_to_y_chunk_index(obj->get_y()))) {
 			tmp->erase(obj->get_id());

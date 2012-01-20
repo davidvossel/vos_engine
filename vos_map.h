@@ -32,6 +32,10 @@ class vos_map_object {
 		int x;
 		int y;
 		int id;
+		/* current ticks */
+		int ticks;
+		/* difference since last update */
+		int ticks_diff;
 
 		/* structure used for generic collision
 		 * callback reporting on object */
@@ -49,6 +53,7 @@ class vos_map_object {
 			struct vos_map_object_data *data);
 		virtual ~vos_map_object() {};
 
+		int update_ticks(int ticks);
 		/* get x_coordinate */
 		int get_x();
 		/* get y_coordinate */
@@ -58,9 +63,9 @@ class vos_map_object {
 		 * wish to travel */
 		int calc_dist(int ticks, int pps);
 		/* update means update your AI logic or whatever */
-		virtual int update(int ticks) = 0;
+		virtual int update() = 0;
 		/* Render means that you're actually getting drawn on the screen */
-		virtual int render(int ticks) = 0;
+		virtual int render() = 0;
 		/* when this returns true, the object gets removed from chunk */
 		int delete_me();
 		/* did a collision rect i registered collid with anything

@@ -41,7 +41,6 @@ int player_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void
 class player: public vos_map_object {
 	private:
 		int hitid;
-		int last_tick;
 	public:
 		player(int x, int y, struct vos_map_object_data *data) : vos_map_object(x, y, data) {
 			hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
@@ -50,10 +49,8 @@ class player: public vos_map_object {
 			c_engine->unregister_rect(hitid);
 		}
 
-		int update(int ticks) {
-			int time_lapse = ticks - last_tick;
-			int dist = calc_dist(time_lapse, 200);
-			last_tick = ticks;
+		int update() {
+			int dist = calc_dist(ticks_diff, 200);
 
 			if (controllers->is_button_active(PLAYER1_CONTROLLER, VOS_CON_DOWN)) {
 				y += dist;
@@ -71,7 +68,7 @@ class player: public vos_map_object {
 			map->center_camera_on(x, y);
 			return 0;
 		}
-		int render(int ticks) {
+		int render() {
 			int camx = map->map2cam_x(x);
 			int camy = map->map2cam_y(y);
 			m_engine->draw_image(BLUE_DOT, camx, camy);
@@ -92,13 +89,13 @@ class thing: public vos_map_object {
 			c_engine->unregister_rect(hitid);
 		}
 
-		int update(int ticks) {
+		int update() {
 			if (am_i_hit_by(hitid, COLLISION_CAT_PLAYER1)) {
 				ready_for_deletion = 1;
 			}
 			return 0;
 		}
-		int render(int ticks) {
+		int render() {
 			int camx = map->map2cam_x(x);
 			int camy = map->map2cam_y(y);
 			m_engine->draw_image(RED_DOT, camx, camy);
@@ -107,100 +104,6 @@ class thing: public vos_map_object {
 			return 0;
 		}
 };
-
-#if 0
-class Dot: public vos_map_object {
-    private:
-	unsigned int hitid;
-	int hit_timeout;
-	int x_pix_sec;
-	int y_pix_sec;
-	int x_dir;
-	int y_dir;
-	int last_ticks;
-
-    public:
-
-		int ishit;
-		Dot(int x, int y, struct vos_map_object_data *data) :
-			vos_map_object(x, y, data)
-	{
-		ishit = 0;
-		x_pix_sec = ((unsigned int) rand() % 50) + 111;
-		y_pix_sec = ((unsigned int) rand() % 50) + 111;
-		x_dir = 1;
-		y_dir = 1;
-		hit_timeout = 0;
-		last_ticks = 0;
-		hitid = c_engine->register_rect(player_cb, 1, this, -1, -1, 3, 3);
-	}
-
-    int update(int ticks) { return 0; }
-    int render(int camera_x, int camera_y, int ticks);
-};
-
-
-
-int Dot::render(int camera_x, int camera_y, int ticks)
-{
-	float x_dist = 0;
-	float y_dist = 0;
-	int time_lapse = ticks- last_ticks;
-	int camx,camy;
-
-	if (last_ticks == 0) {
-		last_ticks = ticks;
-		return 0;
-	}
-	last_ticks = ticks;
-
-	x_dist = calc_dist(time_lapse, x_pix_sec*x_dir);
-	y_dist = calc_dist(time_lapse, y_pix_sec*y_dir);
-
-	if (ishit) {
-		m_engine->play_sound(LOW_SOUND);
-		hit_timeout = 100;
-		ishit=0;
-	}
-
-	x += x_dist;
-	y += y_dist;
-
-	if (y > Y_MAP) {
-		y = Y_MAP;
-		y_dir *= -1;
-	}
-	if (y < 0) {
-		y = 0;
-		y_dir *= -1;
-	}
-
-	if (x > X_MAP) {
-		x = X_MAP;
-		x_dir *= -1;
-	}
-	if (x < 0) {
-		x = 0;
-		x_dir *= -1;
-	}
-
-	camx = map2cam_x(x, camera_x);
-	camy = map2cam_y(y, camera_y);
-
-	if (hit_timeout) {
-		m_engine->draw_image(RED_DOT, camx, camy);
-		hit_timeout -= time_lapse;
-		if (hit_timeout < 0) {
-			hit_timeout = 0;
-		}
-	} else {
-		m_engine->draw_image(BLUE_DOT, camx, camy);
-	}
-	c_engine->update_rect_coordinates(hitid, camx, camy);
-
-	return 0;
-}
-#endif
 
 int handle_events(SDL_Event *event)
 {
@@ -214,8 +117,6 @@ int handle_events(SDL_Event *event)
 	return 0;
 }
 
-#define NUM_DOTS 500
-
 int main(int argc, char* args[])
 {
 	SDL_Event event;
@@ -224,7 +125,6 @@ int main(int argc, char* args[])
 	vos_controller_engine *controllers = new vos_controller_engine();
 	vos_map *map = new vos_map(X_MAP, Y_MAP, X_RES, Y_RES);
 	struct vos_map_object_data data;
-//	Dot *dot;
 	int res = 1;
 	int quit = 0;
 	int last;
@@ -256,11 +156,6 @@ int main(int argc, char* args[])
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_DOWN, SDLK_DOWN);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_LEFT, SDLK_LEFT);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_RIGHT, SDLK_RIGHT);
-
-//	for (i = 0; i < NUM_DOTS; i++) {
-//		dot = new Dot(1, 1, &data);
-//		map->add_object(dot);
-//	}
 
 	map->add_object(new player(50, 50, &data));
 

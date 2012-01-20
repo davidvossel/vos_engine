@@ -1,6 +1,6 @@
 #include "vos_map_common.h"
 
-int vos_map_block::render(int ticks)
+int vos_map_block::render()
 {
 	m_engine->draw_image(image_id,
 		map->map2cam_x(x),
