@@ -63,31 +63,9 @@ class  vos_map_bound_object: public vos_map_object {
 			next_y = y;
 		}
 		virtual ~vos_map_bound_object() {};
+		int update_coordinates(int distx, int disty);
 		/* must be called to update position, never use x and y
 		 * directly when using this class */
-		int update_coordinates(int distx, int disty) {
-			for (int i = 0; i < num_collisions; i++) {
-				if (collisions_list[i].data.hitcat == VOS_COLLIDE_BOUNDARY_CAT) {
-					if (collisions_list[i].data.shortest_x) {
-						next_x += collisions_list[i].data.shortest_x;
-						distx = 0;
-						break;
-					}
-					if (collisions_list[i].data.shortest_y) {
-						next_y += collisions_list[i].data.shortest_y;
-						disty = 0;
-						break;
-					}
-				}
-			}
-
-			x = next_x;
-			y = next_y;
-			next_x += distx;
-			next_y += disty;
-			return 0;
-		}
-
 		/* coordinates to render next image on */
 		int get_converted_x() { return map->map2cam_x(x); }
 		int get_converted_y() { return map->map2cam_y(y); }
