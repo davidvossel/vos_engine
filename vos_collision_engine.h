@@ -8,7 +8,6 @@ using namespace std;
 // MUST BE mutliple of 4
 #define HIT_BOXES 16
 
-
 /*!
  * \brief Some collisions catagories are predefined just
  *        so some generic objects can be created.  Any of these
@@ -18,7 +17,27 @@ enum vos_collision_cat {
 	VOS_COLLIDE_BOUNDARY_CAT = 1,
 };
 
-typedef int (*vos_collision_engine_cb)(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
+struct vos_collision_engine_cb_data {
+	unsigned int myid;
+	unsigned int mycat;
+	unsigned int hitid;
+	unsigned int hitcat;
+	/* distance to go to escape collision */
+	int dist_up;
+	int dist_down;
+	int dist_left;
+	int dist_right;
+
+	/* shortest path out of collision.
+	 * just add these two values to the current
+	 * position and the collision will be avoided. */
+	int shortest_x;
+	int shortest_y;
+	
+	void *userdata;
+};
+
+typedef int (*vos_collision_engine_cb)(struct vos_collision_engine_cb_data *data);
 
 struct vos_collision_engine_rect {
 	unsigned int id;
@@ -44,8 +63,10 @@ class vos_collision_engine {
 		map <unsigned int, vos_collision_engine_rect *>::iterator xx;
 		map <unsigned int, vos_collision_engine_rect *>::iterator kk;
 		struct vos_collision_engine_rect sections[HIT_BOXES];
-
-		int detect_collision(struct vos_collision_engine_rect *rect_a, struct vos_collision_engine_rect *rect_b);
+		/* returns true if collision exists, stores
+		 * required information in data struct when present. */
+		int detect_collision(struct vos_collision_engine_rect *rect_a, struct vos_collision_engine_rect *rect_b, vos_collision_engine_cb_data *data);
+		int detect_collision_create_cb_data(struct vos_collision_engine_rect *rect_a, struct vos_collision_engine_rect *rect_b, struct vos_collision_engine_cb_data *data);
 		int update_rect_map(struct vos_collision_engine_rect *rect);
 
 	public:

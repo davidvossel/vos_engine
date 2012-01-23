@@ -20,7 +20,7 @@ class vos_map;
 
 /* use this callback to register collision rects
  * on a vos map object */
-int vos_map_object_collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata);
+int vos_map_object_collision_cb(struct vos_collision_engine_cb_data *data);
 
 class vos_map_object {
 	protected:
@@ -40,10 +40,7 @@ class vos_map_object {
 		/* structure used for generic collision
 		 * callback reporting on object */
 		struct vos_map_object_collisions {
-			int myid;
-			int mycat;
-			int hitid;
-			int hitcat;
+			vos_collision_engine_cb_data data;
 		} collisions_list[COLLISION_LIST_SIZE];
 		int num_collisions;
 
@@ -70,7 +67,7 @@ class vos_map_object {
 		int delete_me();
 		/* did a collision rect i registered collid with anything
 		 * in a specific hit catagory ? */
-		int am_i_hit_by(int myid, int hitcat);
+		int am_i_hit_by(unsigned int myid, unsigned int hitcat);
 		/* returns id of object in map structure */
 		int get_id();
 
@@ -78,7 +75,7 @@ class vos_map_object {
 		/* do not call directly, used by map */
 		int set_id(int id);
 		/* do not call directly, used by generic collision callback */
-		int add_collision(int myid, int mycat, int hitid, int hitcat);
+		int add_collision(struct vos_collision_engine_cb_data *data);
 		/* do not call directly, called by map after rendering */
 		void remove_collisions();
 };

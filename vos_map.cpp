@@ -56,25 +56,22 @@ int vos_map_object::get_id()
 	return id;
 }
 
-int vos_map_object::am_i_hit_by(int myid, int hitcat) {
+int vos_map_object::am_i_hit_by(unsigned int myid, unsigned int hitcat) {
 	int i = 0;
 	if (!num_collisions) {
 		return 0;
 	}
 	for (i = 0; i < num_collisions; i++) {
-		if ((collisions_list[i].myid == myid) && (collisions_list[i].hitcat == hitcat)) {
+		if ((collisions_list[i].data.myid == myid) && (collisions_list[i].data.hitcat == hitcat)) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-int vos_map_object::add_collision(int myid, int mycat, int hitid, int hitcat) {
+int vos_map_object::add_collision(struct vos_collision_engine_cb_data *data) {
 	if (num_collisions < COLLISION_LIST_SIZE) {
-		collisions_list[num_collisions].myid = myid;
-		collisions_list[num_collisions].mycat = mycat;
-		collisions_list[num_collisions].hitid = hitid;
-		collisions_list[num_collisions].hitcat = hitcat;
+		memcpy(&collisions_list[num_collisions].data, data, sizeof(collisions_list[num_collisions].data));
 		num_collisions++;
 	}
 	return 0;
@@ -94,10 +91,10 @@ int vos_map_object::calc_dist(int ticks, int pps) {
 	}
 }
 
-int vos_map_object_collision_cb(unsigned int myid, int mycat, unsigned int hitid, int hitcat, void *userdata)
+int vos_map_object_collision_cb(struct vos_collision_engine_cb_data *data)
 {
-	vos_map_object *obj = (vos_map_object *) userdata;
-	obj->add_collision(myid, mycat, hitid, hitcat);
+	vos_map_object *obj = (vos_map_object *) data->userdata;
+	obj->add_collision(data);
 	return 0;
 }
 

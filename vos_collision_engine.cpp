@@ -1,5 +1,6 @@
 #include "vos_collision_engine.h"
 #include <iostream>
+#include <stdlib.h>
 
 vos_collision_engine::vos_collision_engine(int _x, int _y)
 {
@@ -56,7 +57,6 @@ unsigned int vos_collision_engine::register_rect(vos_collision_engine_cb cb,
 		return -1;
 	}
 
-	// TODO find an ID that hasn't already been given...
 	gen_id++;
 	ii = rects.find(gen_id);
 	while (ii != rects.end()) {
@@ -141,7 +141,7 @@ int vos_collision_engine::update_rect_map(struct vos_collision_engine_rect *rect
 	int i;
 
 	for (i = 0; i < HIT_BOXES; i++) {
-		if (detect_collision(&sections[i], rect)) {
+		if (detect_collision(&sections[i], rect, NULL)) {
 			if (!rect->in_maps[i]) {
 				boxes[i].insert(pair<unsigned int, struct vos_collision_engine_rect *> (rect->id, rect));
 				rect->in_maps[i] = 1;
@@ -156,7 +156,10 @@ int vos_collision_engine::update_rect_map(struct vos_collision_engine_rect *rect
 	return 0;
 }
 
-int vos_collision_engine::detect_collision(struct vos_collision_engine_rect *rect_a, struct vos_collision_engine_rect *rect_b)
+int vos_collision_engine::detect_collision(
+	struct vos_collision_engine_rect *rect_a,
+	struct vos_collision_engine_rect *rect_b,
+	struct vos_collision_engine_cb_data *data)
 {
 	int a_xl = rect_a->x;
 	int a_xr = rect_a->x + rect_a->w;
@@ -170,19 +173,44 @@ int vos_collision_engine::detect_collision(struct vos_collision_engine_rect *rec
 
 	if (a_xl >= b_xr) {
 		return 0;
+	} else if (data) {
+		data->dist_right = b_xr - a_xl;
 	}
 
 	if (a_xr <= b_xl) {
 		return 0;
+	} else if (data) {
+		data->dist_left = b_xl - a_xr; /* will be negative */
 	}
-
+	
 	if (a_yt >= b_yb) {
 		return 0;
+	} else if (data) {
+		data->dist_down = b_yb - a_yt;
 	}
 
 	if (a_yb <= b_yt) {
 		return 0;
+	} else if (data) {
+		data->dist_up = b_yt - a_yb; /* will be negative */
 	}
+
+	if (!data) {
+		return 1;
+	}
+	data->shortest_x = abs(data->dist_left) > data->dist_right ? data->dist_right : data->dist_left;
+	data->shortest_y = abs(data->dist_up) > data->dist_down ? data->dist_down : data->dist_up;
+
+	if (abs(data->shortest_x) >= abs(data->shortest_y)) {
+		data->shortest_x = 0;
+	} else {
+		data->shortest_y = 0;
+	}
+	data->myid = rect_a->id;
+	data->mycat = rect_a->cat;
+	data->hitid = rect_b->id;
+	data->hitcat = rect_b->cat;
+	data->userdata = rect_a->userdata;
 
 	return 1;
 }
@@ -191,6 +219,7 @@ void vos_collision_engine::run_collisions()
 {
 	struct vos_collision_engine_rect *rect_a;
 	struct vos_collision_engine_rect *rect_b;
+	struct vos_collision_engine_cb_data data;
 	int i;
 
 	for (i = 0; i < HIT_BOXES; i++) {
@@ -203,17 +232,15 @@ void vos_collision_engine::run_collisions()
 				if (rect_b->id == rect_a->id) {
 					continue;
 				}
-				if (detect_collision(rect_a, rect_b)) {
+				if (detect_collision(rect_a, rect_b, &data)) {
 					kk = collisions_helper.find(rect_b->id);
 					if (kk != collisions_helper.end()) {
 						continue;
 					}
 					collisions_helper[rect_b->id] = rect_b;
-					rect_a->cb(rect_a->id, rect_a->cat, rect_b->id, rect_b->cat, rect_a->userdata);
+					rect_a->cb(&data);
 				}
 			}
 		}
 	}
-
 }
-
