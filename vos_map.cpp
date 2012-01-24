@@ -71,6 +71,13 @@ int vos_map_object::am_i_hit_by(unsigned int myid, unsigned int hitcat) {
 
 int vos_map_object::add_collision(struct vos_collision_engine_cb_data *data) {
 	if (num_collisions < COLLISION_LIST_SIZE) {
+		// TODO this is bad, I am fixing the symtom of a problem
+		for (int i = 0; i < num_collisions; i++) {
+			if (collisions_list[i].data.hitid == data->hitid) {
+				return 0;
+			}
+		}
+
 		memcpy(&collisions_list[num_collisions].data, data, sizeof(collisions_list[num_collisions].data));
 		num_collisions++;
 	}

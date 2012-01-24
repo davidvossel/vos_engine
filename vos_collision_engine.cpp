@@ -201,11 +201,6 @@ int vos_collision_engine::detect_collision(
 	data->shortest_x = abs(data->dist_left) > data->dist_right ? data->dist_right : data->dist_left;
 	data->shortest_y = abs(data->dist_up) > data->dist_down ? data->dist_down : data->dist_up;
 
-	if (abs(data->shortest_x) >= abs(data->shortest_y)) {
-		data->shortest_x = 0;
-	} else {
-		data->shortest_y = 0;
-	}
 	data->myid = rect_a->id;
 	data->mycat = rect_a->cat;
 	data->hitid = rect_b->id;

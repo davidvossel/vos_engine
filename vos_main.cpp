@@ -42,7 +42,7 @@ class player: public vos_map_bound_object {
 		unsigned int hitid;
 	public:
 		player(int x, int y, struct vos_map_object_data *data) : vos_map_bound_object(x, y, data) {
-			hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x, y, 3, 3);
+			hitid = c_engine->register_rect(vos_map_object_collision_cb, COLLISION_CAT_PLAYER1, this, x, y, 100, 100);
 		}
 		~player() {
 			c_engine->unregister_rect(hitid);
@@ -157,27 +157,18 @@ int main(int argc, char* args[])
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_LEFT, SDLK_LEFT);
 	controllers->set_button_value(PLAYER1_CONTROLLER, VOS_CON_RIGHT, SDLK_RIGHT);
 
-	map->add_object(new player(50, 50, &data));
+	map->add_object(new player(200, 200, &data));
 
 	for (i = 0; i < 100; i++) {
 		map->add_object(new thing(i*40, 100, &data));
 	}
 
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 100, 100, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 60, 140, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 100, 180, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 140, 60, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 40, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 13, 30, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 200, 20, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 190, 10, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 60, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 90, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 300, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 280, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 222, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 80, 333, &data));
-	map->add_object(new vos_map_boundary(GREEN_BLOCK, 120, 26, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 0, 0, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 39,0, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 39,39, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 79,39, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 119,39, &data));
+	map->add_object(new vos_map_boundary(GREEN_BLOCK, 159,39, &data));
 
 	now = SDL_GetTicks();
 	last = now;
